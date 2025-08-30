@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Take2Cash Mobile</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+</head>
+<body class="bg-gradient-to-b from-purple-100 to-purple-50 min-h-screen p-4">
+
+<h1 class="text-center text-3xl font-bold text-purple-700 mb-6">Take2Cash</h1>
+
+<!-- Signup/Login -->
+<div class="max-w-md mx-auto bg-white p-6 rounded-2xl shadow-lg">
+<h2 class="font-bold mb-4 text-xl text-purple-600">Signup / Login</h2>
+<input id="name" placeholder="Name" class="w-full border p-3 mb-3 rounded-lg focus:ring-2 focus:ring-purple-400">
+<input id="email" type="email" placeholder="Email" class="w-full border p-3 mb-3 rounded-lg focus:ring-2 focus:ring-purple-400">
+<input id="pass" type="password" placeholder="Password" class="w-full border p-3 mb-3 rounded-lg focus:ring-2 focus:ring-purple-400">
+<input id="referral" placeholder="Friend UID (optional)" class="w-full border p-3 mb-3 rounded-lg focus:ring-2 focus:ring-purple-400">
+<button id="signupBtn" class="w-full bg-purple-600 text-white p-3 rounded-lg mb-3 hover:bg-purple-700">Sign Up</button>
+<button id="loginBtn" class="w-full bg-green-500 text-white p-3 rounded-lg mb-2 hover:bg-green-600">Log In</button>
+<div id="msg" class="text-red-500 text-sm mt-1 text-center"></div>
+</div>
+
+<!-- Dashboard -->
+<div id="dash" class="hidden max-w-md mx-auto mt-6 bg-white p-6 rounded-2xl shadow-lg">
+<h2 class="font-bold text-purple-700 text-xl mb-3">Dashboard</h2>
+<p class="mb-1">Hi, <span id="userName">—</span></p>
+<p class="mb-1">Balance: <span id="balance">0 Taka</span></p>
+<p class="mb-2 text-sm text-gray-500">Your Referral ID: <span id="userUID">—</span></p>
+
+<button id="activateBtn" class="w-full bg-green-500 text-white p-3 rounded-lg mb-3 hover:bg-green-600">Activate Account (300 Taka)</button>
+<p id="activationStatus" class="text-sm text-gray-500 mb-3">Not active</p>
+
+<h3 class="font-bold mt-2 mb-2 text-purple-600">Daily Reward</h3>
+<button id="dailyRewardBtn" class="w-full bg-yellow-400 text-white p-3 rounded-lg mb-2 hover:bg-yellow-500">Claim 5 Taka</button>
+<p id="dailyRewardStatus" class="text-sm text-gray-500 mb-3"></p>
+
+<h3 class="font-bold mt-2 mb-2 text-purple-600">Withdraw</h3>
+<input id="withdrawPhone" placeholder="Phone number" class="w-full border p-3 mb-2 rounded-lg focus:ring-2 focus:ring-purple-400">
+<input id="withdrawAmount" placeholder="Amount" class="w-full border p-3 mb-2 rounded-lg focus:ring-2 focus:ring-purple-400">
+<button id="withdrawBtn" class="w-full bg-blue-500 text-white p-3 rounded-lg mb-2 hover:bg-blue-600">Submit Withdraw</button>
+<p id="withdrawStatus" class="text-sm text-gray-500 mb-3"></p>
+
+<h3 class="font-bold mt-2 mb-2 text-purple-600">Deposit</h3>
+<p class="mb-2 text-sm">Send money to Bkash: <span class="font-bold">01312106894</span></p>
+<input id="depositPhone" placeholder="Sender number" class="w-full border p-3 mb-2 rounded-lg focus:ring-2 focus:ring-purple-400">
+<input id="depositAmount" placeholder="Amount" class="w-full border p-3 mb-2 rounded-lg focus:ring-2 focus:ring-purple-400">
+<button id="depositBtn" class="w-full bg-green-500 text-white p-3 rounded-lg mb-3 hover:bg-green-600">Submit Deposit</button>
+<p id="depositStatus" class="text-sm text-gray-500 mb-3"></p>
+
+<button id="logoutBtn" class="w-full bg-red-500 text-white p-3 rounded-lg hover:bg-red-600">Logout</button>
+</div>
+
+<!-- WhatsApp Help Floating Button -->
+<a href="https://wa.me/8801307477668" target="_blank" class="fixed bottom-5 right-5 bg-green-500 hover:bg-green-600 text-white p-3 rounded-full shadow-lg flex items-center space-x-2 z-50">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M20.52 3.48A11.92 11.92 0 0012 0C5.37 0 .02 5.37.02 12a11.85 11.85 0 001.7 6.1L0 24l6.2-1.7a11.91 11.91 0 005.8 1.5h.02c6.63 0 12-5.37 12-12 0-3.2-1.25-6.22-3.48-8.52zM12 21.82c-1.83 0-3.63-.5-5.2-1.44l-.37-.22-3.68 1.01 1-3.62-.24-.37A9.826 9.826 0 012.18 12c0-5.45 4.37-9.82 9.82-9.82s9.82 4.37 9.82 9.82-4.37 9.82-9.82 9.82zm5.18-7.22c-.28-.14-1.66-.82-1.92-.91s-.46-.14-.65.14-.75.91-.92 1.1-.34.21-.62.07c-.28-.14-1.18-.44-2.25-1.39-.83-.74-1.39-1.66-1.55-1.94s-.02-.43.12-.57.28-.34.42-.51.19-.28.28-.47.09-.31.14-.52c.05-.21 0-.39-.07-.53s-.65-1.56-.89-2.14c-.23-.57-.46-.49-.62-.5-.16-.01-.35-.01-.54-.01s-.52.07-.8.38c-.28.31-1.07 1.04-1.07 2.53s1.1 2.94 1.25 3.15c.14.21 2.15 3.28 5.2 4.6.73.31 1.3.49 1.74.63.73.23 1.39.2 1.91.12.58-.09 1.66-.68 1.89-1.33.23-.64.23-1.19.16-1.33-.07-.14-.27-.22-.56-.37z"/>
+    </svg>
+    <span class="hidden sm:inline font-semibold">Help</span>
+</a>
+
+<script>
+// Firebase config
+var firebaseConfig = {
+    apiKey: "AIzaSyCf3PHTZHHBDvfx3Eeju4wRqGC0UNGfix4",
+    authDomain: "take2cashbot.firebaseapp.com",
+    projectId: "take2cashbot",
+    storageBucket: "take2cashbot.firebasestorage.app",
+    messagingSenderId: "1061709627457",
+    appId: "1:1061709627457:web:af16302a2d569641b186c0"
+};
+firebase.initializeApp(firebaseConfig);
+var auth = firebase.auth();
+var db = firebase.firestore();
+
+function showMsg(el,text){el.innerText=text;}
+
+// Signup
+document.getElementById('signupBtn').onclick = function(){
+    var name = document.getElementById('name').value;
+    var email = document.getElementById('email').value;
+    var pass = document.getElementById('pass').value;
+    var referral = document.getElementById('referral').value;
+    if(!name || !email || !pass){ showMsg(document.getElementById('msg'),'Enter all fields'); return; }
+
+    auth.createUserWithEmailAndPassword(email, pass)
+    .then(cred=>{
+        var newUserRef = db.collection('users').doc(cred.user.uid);
+        newUserRef.set({name:name, balance:0, active:false, referrer:referral}).then(()=>{
+            showMsg(document.getElementById('msg'),'Signup successful!');
+        });
+    }).catch(err=>showMsg(document.getElementById('msg'),err.message));
+};
+
+// Login
+document.getElementById('loginBtn').onclick = function(){
+    var email=document.getElementById('email').value;
+    var pass=document.getElementById('pass').value;
+    auth.signInWithEmailAndPassword(email,pass)
+    .then(cred=>{
+        db.collection('users').doc(cred.user.uid).get().then(doc=>{
+            var data=doc.data();
+            document.getElementById('userName').innerText=data.name;
+            document.getElementById('balance').innerText=data.balance + " Taka";
+            document.getElementById('userUID').innerText=cred.user.uid;
+            document.getElementById('dash').classList.remove('hidden');
+            showMsg(document.getElementById('msg'),'Logged in!');
+            // Hide activate button if already active
+            if(data.active){
+                document.getElementById('activationStatus').innerText='Active';
+                document.getElementById('activateBtn').style.display='none';
+            }
+        });
+    }).catch(err=>showMsg(document.getElementById('msg'),err.message));
+};
+
+// Logout
+document.getElementById('logoutBtn').onclick = function(){
+    auth.signOut();
+    document.getElementById('dash').classList.add('hidden');
+    showMsg(document.getElementById('msg'),'Logged out');
+};
+
+// Activate account + referral bonus
+document.getElementById('activateBtn').onclick = function(){
+    var user = auth.currentUser;
+    if(!user){ showMsg(document.getElementById('msg'),'Login first'); return; }
+
+    var userRef = db.collection('users').doc(user.uid);
+    userRef.get().then(doc=>{
+        var data = doc.data();
+        if(data.active){
+            document.getElementById('activationStatus').innerText = 'Active';
+            document.getElementById('activateBtn').style.display = 'none';
+            showMsg(document.getElementById('msg'),'Your account is already active');
+            return;
+        }
+
+        if(data.balance >= 300){
+            userRef.update({balance: data.balance - 300, active: true}).then(()=>{
+                document.getElementById('activationStatus').innerText = 'Active';
+                document.getElementById('balance').innerText = (data.balance - 300) + " Taka";
+                document.getElementById('activateBtn').style.display = 'none';
+                showMsg(document.getElementById('msg'),'Account activated!');
+
+                // Referral bonus
+                if(data.referrer){
+                    var refRef = db.collection('users').doc(data.referrer);
+                    refRef.get().then(refDoc=>{
+                        if(refDoc.exists){
+                            let refData = refDoc.data();
+                            if(!refData.bonusGivenFor) refData.bonusGivenFor=[];
+                            if(!refData.bonusGivenFor.includes(user.uid)){
+                                refData.bonusGivenFor.push(user.uid);
+                                refRef.update({
+                                    balance: (refData.balance || 0) + 100,
+                                    bonusGivenFor: refData.bonusGivenFor
+                                });
+                                console.log("Referral bonus 100 Taka added to owner");
+                            }
+                        }
+                    });
+                }
+
+            });
+        } else {
+            showMsg(document.getElementById('msg'),'Insufficient balance');
+        }
+    });
+};
+
+// Daily reward 5 Taka
+document.getElementById('dailyRewardBtn').onclick = function(){
+    var user=auth.currentUser;
+    if(!user){showMsg(document.getElementById('msg'),'Login first'); return;}
+    var now=Date.now();
+    var rewardRef=db.collection('dailyReward').doc(user.uid);
+    rewardRef.get().then(doc=>{
+        if(doc.exists && now-doc.data().lastClaim<24*60*60*1000){
+            showMsg(document.getElementById('dailyRewardStatus'),'Already claimed today'); return;
+        }
+        db.collection('users').doc(user.uid).get().then(u=>{
+            var data=u.data();
+            db.collection('users').doc(user.uid).update({balance:data.balance+5});
+            rewardRef.set({lastClaim:now});
+            document.getElementById('balance').innerText=(data.balance+5) + " Taka";
+            showMsg(document.getElementById('dailyRewardStatus'),'5 Taka added!');
+        });
+    });
+};
+
+// Withdraw with referral check (minimum 3 referrals)
+document.getElementById('withdrawBtn').onclick = function(){
+    var user = auth.currentUser;
+    if(!user){showMsg(document.getElementById('msg'),'Login first'); return;}
+    db.collection('users').where("referrer","==",user.uid).get().then(snap=>{
+        if(snap.size<3){ showMsg(document.getElementById('withdrawStatus'),'Minimum 3 referrals needed'); return; }
+        var phone=document.getElementById('withdrawPhone').value;
+        var amount=parseInt(document.getElementById('withdrawAmount').value);
+        db.collection('withdraws').add({uid:user.uid,phone:phone,amount:amount,status:'pending'});
+        showMsg(document.getElementById('withdrawStatus'),'Withdraw submitted!');
+    });
+};
+
+// Deposit
+document.getElementById('depositBtn').onclick = function(){
+    var user=auth.currentUser;
+    if(!user){showMsg(document.getElementById('msg'),'Login first'); return;}
+    var phone=document.getElementById('depositPhone').value;
+    var amount=parseInt(document.getElementById('depositAmount').value);
+    db.collection('deposits').add({uid:user.uid,sender:phone,amount:amount,status:'pending'});
+    showMsg(document.getElementById('depositStatus'),'Deposit submitted!');
+};
+</script>
+
+</body>
+</html>
